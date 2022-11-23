@@ -1,0 +1,145 @@
+---
+# .ansible-lint
+# https://ansible-lint.readthedocs.io/en/latest/configuring.html#configuration-file
+
+# exclude_paths included in this file are parsed relative to this file's location
+# and not relative to the CWD of execution. CLI arguments passed to the --exclude
+# option will be parsed relative to the CWD of execution.
+exclude_paths:
+  - .cache/  # implicit unless exclude_paths is defined in config
+  - .github/
+  # Excluding Galaxy collections as we don't maintain them, but want to check any custom collections
+  - collections/ansible_collections/ansible
+  - collections/ansible_collections/awx
+  - collections/ansible_collections/cisco
+  - collections/ansible_collections/cloud
+  - collections/ansible_collections/community
+  - collections/ansible_collections/dellemc
+  - collections/ansible_collections/dynatrace
+  - collections/ansible_collections/google
+  - collections/ansible_collections/ibm
+  - collections/ansible_collections/kubernetes
+  - collections/ansible_collections/netapp
+  - collections/ansible_collections/servicenow
+  - collections/ansible_collections/theforeman
+  - collections/ansible_collections/vmware
+  - collections/ansible_collections/azure/azcollection
+  # Excluding Galaxy roles here, but do not list MTS developed roles
+  # None so far
+  # Excluding custom_plugins, starting with all mitogen versions
+  - custom_plugins/mitogen*
+  # Excluding folders and files that are yaml files but not Ansible playbooks
+  - pipeline/
+  - execution_environment/execution-environment.yml
+  # Excluding non-ansible yaml files in each role
+  - roles/*/.travis.yml
+  - VMware/files/buildvars.yml  # Variable file that is being treated as a playbook
+  - ActiveDirectory/ADDynamicInventory_*.yml  # This calls a plugin and is not a playbook
+  - Linux/inventory.yml  # This calls a plugin and is not a playbook
+  # Netapp EEOD collection
+  - Netapp/EEOD/
+
+# parseable: true
+# quiet: true
+# verbosity: 1
+
+# Mock modules or roles in order to pass ansible-playbook --syntax-check
+mock_modules:
+  - zuul_return
+  # note the foo.bar is invalid as being neither a module or a collection
+  - fake_namespace.fake_collection.fake_module
+  - fake_namespace.fake_collection.fake_module.fake_submodule
+mock_roles:
+  - mocked_role
+  - author.role_name  # old standalone galaxy role
+  - fake_namespace.fake_collection.fake_role  # role within a collection
+
+# Enable checking of loop variable prefixes in roles
+loop_var_prefix:
+  - "{role}_"
+  - "inner_"
+
+# Enforce variable names to follow pattern below, in addition to Ansible own
+# requirements, like avoiding python identifiers. To disable add `var-naming`
+# to skip_list.
+# var_naming_pattern: "^[a-z_][a-z0-9_]*$"
+
+use_default_rules: true
+# Load custom rules from this specific folder
+# rulesdir:
+#   - ./rule/directory/
+
+# This makes linter to fully ignore rules/tags listed below
+skip_list:
+  - skip_this_tag
+  - git-latest
+  - truthy  # May enable this later, but it is not expected to break anything and very noisy
+  - fqcn-builtins  # Too noisy and we can enable this later. Not expected to break anything
+  - meta-incorrect  # Not currently concerned with metadata on custom roles.  Can revisit later
+  - meta-no-info  # Not currently concerned with metadata on custom roles.  Can revisit later
+  - '204'  # Undocumented rule for line length that we are skipping for now https://github.com/ansible-community/ansible-lint/issues/451#issuecomment-450341000
+  - no-log-password  # This is erroneously popping up for valid VMware modules and their password fields. Disabling for now, we need to talk about it.
+  - '602'  # Longstanding issue that even Jeff Geerling says should probably be ignored, so we will too
+  - no-loop-var-prefix  # We aren't concerned with this at this time and will revisit later when we understand it more and want to address
+
+# Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
+# mentioned in the enable_list:
+enable_list:
+  - fqcn-builtins  # opt-in
+  - no-log-password  # opt-in
+  - no-same-owner  # opt-in
+  # add yaml here if you want to avoid ignoring yaml checks when yamllint
+  # library is missing. Normally its absence just skips using that rule.
+  # - yaml
+# Report only a subset of tags and fully ignore any others
+# tags:
+#   - var-spacing
+
+# This makes the linter display but not fail for rules/tags listed below:
+warn_list:
+  - skip_this_tag
+  - git-latest
+  - experimental  # experimental is included in the implicit list
+  # - role-name
+
+# Offline mode disables installation of requirements.yml
+offline: true
+
+# Define required Ansible's variables to satisfy syntax check
+extra_vars:
+  foo: bar
+  multiline_string_variable: |
+    line1
+    line2
+  complex_variable: ":{;\t$()"
+  script_host: vmware_script_host  # Needed for powershell_win_shell to pass
+  vcenter: stl-avclabt01.smrcy.com  # Needed for esxtop_collection.yml to validate
+  ad_domain: smrcy.com  # Needed for most playbooks that use the ActiveDirectory inventory
+  computername: testcomputer  # Needed for a lot of windows based playbooks that create in-memory hosts
+  sn_workflow_instance: mercyservicemanagerdev
+  ipaddress: 127.0.0.1  # Needed for playbooks that create in-memory hosts
+  snapshot_target: nas_ssh_test
+  healthconnect_inv: fake_var
+  array: sunnepc01a.smrcy.com
+  host: share_type
+  share_type: nas_ssh_test
+  async: 1
+  poll: 1
+  hostvars:
+    localhost:
+      apihost: fake_var  # Needed for some openshift playbooks, such as "Openshift/create_awx_db_backup_cronjob.yml" on line 30
+  subscription: testsubscription  # Needed for Azure/windows_deploy_vm.yml
+
+# Uncomment to enforce action validation with tasks, usually is not
+# needed as Ansible syntax check also covers it.
+# skip_action_validation: false
+
+# List of additional kind:pattern to be added at the top of the default
+# match list, first match determines the file kind.
+kinds:
+  # - playbook: "**/examples/*.{yml,yaml}"
+  # - galaxy: "**/folder/galaxy.yml"
+  # - tasks: "**/tasks/*.yml"
+  # - vars: "**/vars/*.yml"
+  # - meta: "**/meta/main.yml"
+  - yaml: "**/*.yaml-too"

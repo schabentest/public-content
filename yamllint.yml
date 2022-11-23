@@ -1,0 +1,56 @@
+---
+
+# Config file file yamllint, based on
+# https://yamllint.readthedocs.io/en/stable/configuration.html#default-configuration
+
+# This modifies the default values without defining all of them here
+# See below for a reference of default values
+extends: default
+
+rules:
+  line-length: disable
+  trailing-spaces: disable  # May enable this later, but it is not expected to break anything
+  truthy: disable  # Will revisit this at a later time, as som 3rd party modules may need things other than 'true' or 'false' to run
+
+
+ignore: |
+  /this/specific/file.yaml
+  collections/ansible_collections/
+  custom_plugins/mitogen*
+  *.template.yaml
+  Netapp/EEOD/
+
+
+# Default values below for reference
+
+# yaml-files:
+#   - '*.yaml'
+#   - '*.yml'
+#   - '.yamllint'
+
+# rules:
+#   braces: enable
+#   brackets: enable
+#   colons: enable
+#   commas: enable
+#   comments:
+#     level: warning
+#   comments-indentation:
+#     level: warning
+#   document-end: disable
+#   document-start:
+#     level: warning
+#   empty-lines: enable
+#   empty-values: disable
+#   hyphens: enable
+#   indentation: enable
+#   key-duplicates: enable
+#   key-ordering: disable
+#   line-length: enable
+#   new-line-at-end-of-file: enable
+#   new-lines: enable
+#   octal-values: disable
+#   quoted-strings: disable
+#   trailing-spaces: enable
+#   truthy:
+#     level: warning
